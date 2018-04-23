@@ -1,6 +1,5 @@
 #include <iostream>
 #include "ProblemSolver.h"
-#include "Constraint.h"
 #include "QBoundaryConstraint.h"
 
 
@@ -20,8 +19,9 @@ int main() {
     } else {
         for (int i = 0; i < result.size(); ++i) {
 
-            std::cout << "Result is - " << result[i] << std::endl;
+            std::cout << "Result is - " << *result[i] << std::endl;
         }
     }
     return 0;
 }
+

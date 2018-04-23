@@ -1,6 +1,6 @@
-cmake_minimum_required(VERSION 3.10)
+cmake_minimum_required(VERSION 3.7.2)
 project(RecursiveTemplate)
 
-set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD 14)
 
-add_executable(RecursiveTemplate main.cpp ProblemSolver.h ProblemSolver.cpp QBoundaryConstraint.h)
+add_executable(RecursiveTemplate main.cpp Constraint.h ProblemSolver.h QBoundaryConstraint.h)
