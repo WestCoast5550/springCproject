@@ -3,10 +3,10 @@
 
 #include <vector>
 
-template<class T>
+template<class T, class K>
 class Constraint {
 public:
-    virtual bool CheckConstraint(std::vector<T *>, T *) = 0;
+    virtual bool CheckConstraint(std::vector<T *>, T *, K *) = 0;
 };
 
 

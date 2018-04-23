@@ -3,4 +3,4 @@ project(RecursiveTemplate)
 
 set(CMAKE_CXX_STANDARD 14)
 
-add_executable(RecursiveTemplate main.cpp Constraint.h ProblemSolver.h QBoundaryConstraint.h)
+add_executable(RecursiveTemplate main.cpp Constraint.h ProblemSolver.h NQueensBoundaryConstraint.h KnapsackEntity.h KnapsackBoundaryConstraint.h NQueensLeafConstraint.h KnapsackLeafConstrait.h)

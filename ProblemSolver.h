@@ -4,14 +4,16 @@
 #include <vector>
 #include "Constraint.h"
 
-template<int N, class ITEM_TYPE, class B_CONSTRAINT, class L_CONSTRAINT>
+template<int N, class ITEM_TYPE, class B_CONSTRAINT, class L_CONSTRAINT, class CONSTRAINT>
 class ProblemSolver {
 private:
     std::vector<ITEM_TYPE *> items;
-    Constraint<ITEM_TYPE> *bConstraint;
-    Constraint<ITEM_TYPE> *lConstraint;
+    Constraint<ITEM_TYPE, CONSTRAINT> *bConstraint;
+    Constraint<ITEM_TYPE, CONSTRAINT> *lConstraint;
+    CONSTRAINT * c;
+    std::vector<std::vector<ITEM_TYPE *>> result;
 
-    std::vector<ITEM_TYPE *> findSolution(std::vector<ITEM_TYPE *> currentPath, int pathSize, ITEM_TYPE *newItem) {
+    std::vector<ITEM_TYPE *> findSolution(std::vector<ITEM_TYPE *> currentPath, int pathSize, ITEM_TYPE *newItem, CONSTRAINT *c) {
         std::vector<ITEM_TYPE *> path;
         path.reserve((unsigned long) N);
         if (currentPath.size() != 0) {
@@ -20,20 +22,19 @@ private:
             }
         }
 
-        int oi = N;
-        unsigned  i = 0;
-        if (pathSize == N - 1) {
+        if (lConstraint->CheckConstraint(path, newItem, c)) {
 
-            if ((bConstraint == nullptr || bConstraint->CheckConstraint(path, newItem)) && (lConstraint == nullptr || lConstraint->CheckConstraint(path, newItem))) {
+            if ((bConstraint->CheckConstraint(path, newItem, c))
+                && (lConstraint == nullptr || lConstraint->CheckConstraint(path, newItem, c))) {
                 path.insert(path.begin() + pathSize, newItem);
                 return path;
             }
         } else {
-            if (bConstraint == nullptr || bConstraint->CheckConstraint(path, newItem)) {
+            if (bConstraint->CheckConstraint(path, newItem, c)) {
 
                 path.insert(path.begin() + pathSize, newItem);
                 for (int i = 0; i < items.size(); ++i) {
-                    std::vector<ITEM_TYPE *> possibleSolution = findSolution(path, pathSize + 1, items[i]);
+                    std::vector<ITEM_TYPE *> possibleSolution = findSolution(path, pathSize + 1, items[i], c);
                     if (possibleSolution.size() == 0)
                         continue;
                     return possibleSolution;
@@ -45,26 +46,26 @@ private:
     }
 
 public:
-    std::vector<ITEM_TYPE *> Solve(std::vector<ITEM_TYPE *> items, B_CONSTRAINT *boundaryConstraint = nullptr,
-                                   L_CONSTRAINT *leafConstraint = nullptr) {
+    std::vector<std::vector<ITEM_TYPE *>> Solve(std::vector<ITEM_TYPE *> items, B_CONSTRAINT *boundaryConstraint,
+                                   L_CONSTRAINT *leafConstraint, CONSTRAINT *c) {
         this->items = items;
-        if (Constraint<ITEM_TYPE> *bc = reinterpret_cast<Constraint<ITEM_TYPE> *>(boundaryConstraint)) {
-            Constraint<ITEM_TYPE> *lc = reinterpret_cast<Constraint<ITEM_TYPE> *>(leafConstraint);
-            if (lc || leafConstraint == nullptr) {
+        if (Constraint<ITEM_TYPE, CONSTRAINT> *bc = reinterpret_cast<Constraint<ITEM_TYPE, CONSTRAINT> *>(boundaryConstraint)) {
+            Constraint<ITEM_TYPE, CONSTRAINT> *lc = reinterpret_cast<Constraint<ITEM_TYPE, CONSTRAINT> *>(leafConstraint);
+            if (lc) {
 
                 bConstraint = bc;
                 lConstraint = lc;
 
                 for (int i = 0; i < items.size(); i++) {
-                    auto path = findSolution(std::vector<ITEM_TYPE *>(), 0, items[i]);
+                    auto path = findSolution(std::vector<ITEM_TYPE *>(), 0, items[i], c);
                     if (path.size() == 0) {
                         continue;
                     }
-                    return path;
+                    this->result.push_back(path);
                 }
             }
         }
-        return std::vector<ITEM_TYPE *>();
+        return result;
     }
 };
 
